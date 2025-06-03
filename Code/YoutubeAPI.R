@@ -48,5 +48,32 @@ res <- lapply(vid_ids, get_all_stats)
 
 res_df <- bind_rows(lapply(res, as.data.frame))
 
+library(stringr)
+
 # TODO: Get videoname and uploaddate with "get_video_details" 
+res_df <- res_df %>%
+  rowwise() %>%
+  mutate(
+    details = list(get_video_details(id)),
+    title = details$items[[1]]$snippet$title,
+    publishedAt = details$items[[1]]$snippet$publishedAt,
+    accessDate = Sys.Date(),
+  ) %>%
+  ungroup() %>%
+  select(-details)%>%
+  filter(str_detect(title, regex("(T|t|)?iny\\s*(D|d)?esk\\s*(C|c)?oncert", ignore_case = TRUE)))%>%
+  mutate(concertType <-  if(str_detect(title, regex("(H|h|)?ome", ignore_case = TRUE))){
+    "H"}else if(str_detect(title, regex("(C|c|)?ontest", ignore_case = TRUE))| #Contest
+                str_detect(title, regex("(F|f|)?amily\\s*(H|h|)?our", ignore_case = TRUE))| #Family hour
+                str_detect(title, regex("(F|f|)?rom\\s*(T|t|)?he\\s*(A|a|)?rchiv(e|es|)?", ignore_case = TRUE))| #From the Archives
+                str_detect(title, regex("(M|m|)?ee(t|ts|)?", ignore_case = TRUE))| #Meets...
+                str_detect(title, regex("(K|k|)?orea", ignore_case = TRUE))| #Korea
+                str_detect(title, regex("(J|j|)?apan", ignore_case = TRUE)) #Japan
+                               ){"S"}else{"N"})
+
+# ToDo: 
+# - Filtern nach Special-Concerts -> String Abfrage und dann in extra Spalte als Merkmal hinterlegen
+# - Künstler rausfiltern (Text bis ":")
+# - Nach Künstler-Followern suchen
+
 
