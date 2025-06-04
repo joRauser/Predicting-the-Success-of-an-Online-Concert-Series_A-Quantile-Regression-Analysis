@@ -61,19 +61,29 @@ res_df <- res_df %>%
   ) %>%
   ungroup() %>%
   select(-details)%>%
+  # For more details about the String-processing visit: https://cran.r-project.org/web/packages/stringr/vignettes/regular-expressions.html
   filter(str_detect(title, regex("(T|t|)?iny\\s*(D|d)?esk\\s*(C|c)?oncert", ignore_case = TRUE)))%>%
-  mutate(concertType <-  if(str_detect(title, regex("(H|h|)?ome", ignore_case = TRUE))){
-    "H"}else if(str_detect(title, regex("(C|c|)?ontest", ignore_case = TRUE))| #Contest
-                str_detect(title, regex("(F|f|)?amily\\s*(H|h|)?our", ignore_case = TRUE))| #Family hour
-                str_detect(title, regex("(F|f|)?rom\\s*(T|t|)?he\\s*(A|a|)?rchiv(e|es|)?", ignore_case = TRUE))| #From the Archives
-                str_detect(title, regex("(M|m|)?ee(t|ts|)?", ignore_case = TRUE))| #Meets...
-                str_detect(title, regex("(K|k|)?orea", ignore_case = TRUE))| #Korea
-                str_detect(title, regex("(J|j|)?apan", ignore_case = TRUE)) #Japan
-                               ){"S"}else{"N"})
+  mutate(concertType = case_when(
+    str_detect(title, regex("\\bhome", ignore_case = TRUE)) ~ "H", #Home Concerts
+    str_detect(title, regex("\\bcontest|\\bfamily\\s*hour\\b|from\\s*the\\s*archiv(e|es|)?|\\bmeet(s)?|korea|japan", ignore_case = TRUE)) ~ "S",
+    #Special Concerts (Contests, Family hours, from the Archives, Collaborations(Meets), other Countries(Here Japan and Korea))
+    TRUE ~ "N"
+  )) %>%
+  # Get Artist-name out of title
+  mutate(artist = ifelse(concertType=="N", str_trim(str_extract(title, "^[^:]+")), "Not a normal Concert")) %>%
+  # Get number of concerts played
+  arrange(artist, publishedAt) %>%
+  group_by(artist) %>%
+  mutate(concertNumber = row_number()) %>%
+  ungroup()
+
+
 
 # ToDo: 
-# - Filtern nach Special-Concerts -> String Abfrage und dann in extra Spalte als Merkmal hinterlegen
-# - Künstler rausfiltern (Text bis ":")
-# - Nach Künstler-Followern suchen
+# - Nach Künstler-Followern suchen 
+# -> Use yt_search for channels. Search multiple channels (first five or sth. and return the one with max followers)
+# - Spalte mit "How many Concerts" einführen
+# - Code auf gesamten Datensatz anwenden
+
 
 
