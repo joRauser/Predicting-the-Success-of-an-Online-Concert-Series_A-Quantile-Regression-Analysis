@@ -44,12 +44,15 @@ get_all_stats <- function(id) {
 } 
 
 # Get stats and convert results to data frame 
-res <- lapply(vid_ids, get_all_stats)
+vidStats <- lapply(vid_ids, get_all_stats)
 
-res_df <- bind_rows(lapply(res, as.data.frame))
+vidStats_df <- bind_rows(lapply(vidStats, as.data.frame))
+
+library(rio)
+export(vidStats_df, "Rohdaten_YoutubeAPI.csv")
+vidStats_df <- import("Rohdaten_YoutubeAPI.csv", format = "csv")
 
 library(stringr)
-
 # needed to get the subscribers of the artists => ON PAUSE
 get_max_subscribers <- function(artist_name) {
   # Fehler abfangen & Ausgabe unterdrücken
@@ -79,8 +82,7 @@ get_max_subscribers <- function(artist_name) {
 }
 
 
-
-res_df <- res_df %>%
+vidStats_df <- vidStats_df %>%
   rowwise() %>%
   mutate(
     details = list(get_video_details(id)),
@@ -91,7 +93,7 @@ res_df <- res_df %>%
   ungroup() %>%
   select(-details)%>%
   # For more details about the String-processing visit: https://cran.r-project.org/web/packages/stringr/vignettes/regular-expressions.html
-  filter(str_detect(title, regex("(T|t|)?iny\\s*(D|d)?esk\\s*(C|c)?oncert", ignore_case = TRUE)))%>%
+  filter(str_detect(title, regex("tiny\\s*desk\\s*(\\(home\\)\\s*)?concert", ignore_case = TRUE))) %>%
   mutate(concertType = case_when(
     str_detect(title, regex("\\bhome", ignore_case = TRUE)) ~ "H", #Home Concerts
     str_detect(title, regex("\\bcontest|\\bfamily\\s*hour\\b|from\\s*the\\s*archiv(e|es|)?|\\bmeet(s)?|korea|japan", ignore_case = TRUE)) ~ "S",
@@ -103,17 +105,37 @@ res_df <- res_df %>%
   # Get number of concerts played
   arrange(artist, publishedAt) %>%
   group_by(artist) %>%
-  mutate(concertNumber = row_number()) %>%
-  ungroup() 
+  mutate(concertNumber = ifelse(artist != "Not a normal Concert", row_number(), 0)) %>%
+  ungroup()
   # Get number of Followers per Artist => On Pause bcs of overload on API
   # mutate(artistFollowers = map_dbl(as.character(artist), get_max_subscribers)) 
 
 
 
+export(vidStats_df, "RohdatenVollständig_YoutubeAPI.csv")
+vidStats_df <- import("RohdatenVollständig_YoutubeAPI.csv", format = "csv")
+
+# Datentyp-Anpassung und Reinigung
+vidStats_df$publishedAt <- as.Date(substr(vidStats_df$publishedAt, 1, 10))
+vidStats_df$accessDate <- as.Date(vidStats_df$accessDate)
+
+vidStats_df$viewCount <- as.numeric(vidStats_df$viewCount)
+vidStats_df$likeCount <- as.numeric(vidStats_df$likeCount)
+vidStats_df$commentCount <- as.numeric(vidStats_df$commentCount)
+
+vidStats_df$concertType <- relevel(as.factor(vidStats_df$concertType), ref = "N")
+
+vidStat_cleaned <- vidStats_df %>%
+  mutate(age = accessDate - publishedAt) %>%
+  select(-favoriteCount, -id, -accessDate) %>%
+  drop_na()
+  
+vidStat_cleaned$age <- as.numeric(vidStat_cleaned$age)
 
 # ToDo: 
 # - Nach Künstler-Followern suchen -> Später überprüfen ob funktioniert (Kontingent verbraucht)
 # -> Use yt_search for channels. Search multiple channels (first five or sth. and return the one with max followers)
+
 
 # - Code auf gesamten Datensatz anwenden
 # - Datensatz säubern (zB Datentyp bei den Datums)
