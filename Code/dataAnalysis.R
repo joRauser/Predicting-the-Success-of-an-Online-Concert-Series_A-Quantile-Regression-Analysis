@@ -37,27 +37,49 @@ ggplot(quantile_df, aes(x = quantile, y = value, fill = concertType)) +
 
 # REGRESSION
 
+
 # Linear Regression
-linReg_clicks <- lm(data = trainData, formula = viewCount ~ concertNumber + age + concertType)
+linReg_clicks <- lm(data = trainData, formula = viewCount ~ age + concertType)
 summary(linReg_clicks)
 
-linReg_likes <- lm(data = trainData, formula = likeCount ~ concertNumber + age + concertType)
+linReg_likes <- lm(data = trainData, formula = likeCount ~ age + concertType)
 summary(linReg_likes)
 
-linReg_comments <- lm(data = trainData, formula = commentCount ~ concertNumber + age + concertType)
+linReg_comments <- lm(data = trainData, formula = commentCount ~ age + concertType)
 summary(linReg_comments)
 
 
 # Loglinear Regression
-loglinReg_clicks <- lm(data = trainData, formula = log(viewCount) ~ concertNumber + age + concertType)
+loglinReg_clicks <- lm(data = trainData, formula = log(viewCount) ~ age + concertType)
 summary(loglinReg_clicks)
 
-loglinReg_likes <- lm(data = trainData, formula = log(likeCount) ~ concertNumber + age + concertType)
+loglinReg_likes <- lm(data = trainData, formula = log(likeCount) ~ age + concertType)
 summary(loglinReg_likes)
 
 
 logData <- trainData %>%
   mutate(commentCount = ifelse(commentCount == 0, 1, commentCount))
-loglinReg_comments <- lm(data = logData, formula = log(commentCount) ~ concertNumber + age + concertType)
+loglinReg_comments <- lm(data = logData, formula = log(commentCount) ~ age + concertType)
 summary(loglinReg_comments)
+
+
+# When the concertNumber should be examined, the concert which are not analysable regarding the ConcertCount have to be filtered out:
+trainData_coNum <- trainData %>%
+  filter(concertNumber != 0) %>%
+  mutate(isSecCon = ifelse(concertNumber == 1, FALSE, TRUE))
+
+secClicks <- lm(data = trainData_coNum, formula = viewCount ~ isSecCon + age)
+summary(secClicks)
+
+logsecClicks <- lm(data = trainData_coNum, formula = log(viewCount) ~ isSecCon + age)
+summary(logsecClicks)
+
+# Coronaeinfluss?? -> Jahreszeiträume aufteilen und untersuchen ODER veröffentlichungsjahr als Dummy-Variable => Effekte wie zB Videos aus 2020 sehr oft geklickt
+# Saisonalität untersuchen -> Monate untersuchen
+
+
+
+
+
+
 

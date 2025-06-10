@@ -15,12 +15,9 @@ get_stats(video_id = "g5N9AOfgLZA")
 test <- get_video_details(video_id="g5N9AOfgLZA")
 
 
-
-
 # Channel-ID of NPR Music: UC4eYXhJI4-7wSWc8UNRwD4A
 
 channel <- get_channel_stats(channel_id = "UC4eYXhJI4-7wSWc8UNRwD4A")
-
 
 
 
@@ -49,6 +46,7 @@ vidStats <- lapply(vid_ids, get_all_stats)
 vidStats_df <- bind_rows(lapply(vidStats, as.data.frame))
 
 library(rio)
+# Save Quota
 export(vidStats_df, "Rohdaten_YoutubeAPI.csv")
 vidStats_df <- import("Rohdaten_YoutubeAPI.csv", format = "csv")
 
@@ -91,7 +89,13 @@ vidStats_df <- vidStats_df %>%
     accessDate = Sys.Date(),
   ) %>%
   ungroup() %>%
-  select(-details)%>%
+  select(-details)
+# Save Quota
+export(vidStats_df, "RohdatenVollständig_YoutubeAPI.csv")
+vidStats_df <- import("RohdatenVollständig_YoutubeAPI.csv", format = "csv")
+
+# From now on usage without Quota
+vidStats_df <- vidStats_df %>%
   # For more details about the String-processing visit: https://cran.r-project.org/web/packages/stringr/vignettes/regular-expressions.html
   filter(str_detect(title, regex("tiny\\s*desk\\s*(\\(home\\)\\s*)?concert", ignore_case = TRUE))) %>%
   mutate(concertType = case_when(
@@ -109,11 +113,11 @@ vidStats_df <- vidStats_df %>%
   ungroup()
   # Get number of Followers per Artist => On Pause bcs of overload on API
   # mutate(artistFollowers = map_dbl(as.character(artist), get_max_subscribers)) 
+#### -> Höndisch probieren, wie gut das beispielhaft überhaupt (konzeptionell) funktioniert 
 
 
-
-export(vidStats_df, "RohdatenVollständig_YoutubeAPI.csv")
-vidStats_df <- import("RohdatenVollständig_YoutubeAPI.csv", format = "csv")
+export(vidStats_df, "RohdatenGefiltert_YoutubeAPI.csv")
+vidStats_df <- import("RohdatenGefiltert_YoutubeAPI.csv", format = "csv")
 
 # Datentyp-Anpassung und Reinigung
 vidStats_df$publishedAt <- as.Date(substr(vidStats_df$publishedAt, 1, 10))
@@ -131,6 +135,10 @@ vidStat_cleaned <- vidStats_df %>%
   drop_na()
   
 vidStat_cleaned$age <- as.numeric(vidStat_cleaned$age)
+
+export(vidStat_cleaned, "Daten_YoutubeAPI.csv")
+
+
 
 # ToDo: 
 # - Nach Künstler-Followern suchen -> Später überprüfen ob funktioniert (Kontingent verbraucht)
