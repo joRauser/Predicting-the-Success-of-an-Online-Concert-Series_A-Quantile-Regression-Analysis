@@ -70,3 +70,35 @@ summary(linSeaRegSpr)
 # Seasonal Baseline = Summer
 linSeaRegSum <- lm(log(viewCount) ~ season_fact, data = transform(dummySeason, season_fact = relevel(as.factor(season), ref = "summer")))
 summary(linSeaRegSum)
+
+
+
+
+
+
+
+#### PASTE RELEVANT STATS OF MULTIPLE REGRESSIONS IN ONE DATAFRAME
+library(broom)
+# List of Models:
+models <- list(
+  "Autumn as Baseline" = lm(log(viewCount) ~ season, data = dummySeason),
+  "Winter as Baseline" = lm(log(viewCount) ~ season_fact,
+                            data = transform(dummySeason, season_fact = relevel(as.factor(season), ref = "winter"))),
+  "Spring as Baseline" = lm(log(viewCount) ~ season_fact,
+                            data = transform(dummySeason, season_fact = relevel(as.factor(season), ref = "spring"))),
+  "Summer as Baseline" = lm(log(viewCount) ~ season_fact,
+                            data = transform(dummySeason, season_fact = relevel(as.factor(season), ref = "summer")))
+)
+
+# extract results
+seasonModels <- lapply(names(models), function(model_name) {
+  tidy(models[[model_name]]) %>%
+    mutate(Model = model_name) # Modellname hinzufügen
+})
+
+seasonModels_df <- do.call(rbind, seasonModels)
+# optional: 
+seasonModels_df <- seasonModels_df[, c("Model", "term", "estimate", "std.error", "statistic", "p.value")]
+
+# Ausgabe
+print(seasonModels_df)
