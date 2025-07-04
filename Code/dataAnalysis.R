@@ -4,6 +4,8 @@ train_dummy <- sample.int(nrow(vidStat_cleaned), floor(.7*nrow(vidStat_cleaned))
 trainData <- vidStat_cleaned[train_dummy,]
 testData <- vidStat_cleaned[-train_dummy,]
 
+# fivehold cross validation -> Whithen / James and -> Intro to statistical learning 
+
 # GET OVERVIEW
 summary(trainData)
 
@@ -68,18 +70,20 @@ trainData_coNum <- trainData %>%
   filter(concertNumber != 0) %>%
   mutate(isSecCon = ifelse(concertNumber == 1, FALSE, TRUE))
 
-secClicks <- lm(data = trainData_coNum, formula = viewCount ~ isSecCon + age)
+secClicks <- lm(data = trainData_coNum, formula = viewCount ~ concertNumber + age)
 summary(secClicks)
 
-logsecClicks <- lm(data = trainData_coNum, formula = log(viewCount) ~ isSecCon + age)
+logsecClicks <- lm(data = trainData_coNum, formula = log(viewCount) ~ concertNumber + age)
 summary(logsecClicks)
 
-# Coronaeinfluss?? -> Jahreszeiträume aufteilen und untersuchen ODER veröffentlichungsjahr als Dummy-Variable => Effekte wie zB Videos aus 2020 sehr oft geklickt
-# Saisonalität untersuchen -> Monate untersuchen
 
 
 
+# Find out why this does not work:
+printQuantreg(trainData_coNum, viewCount, concertNumber, "YoutubeClicks", "ConcertNumber")
+# This one does worK:
+printQuantreg(trainData_coNum, trainData_coNum$viewCount, trainData_coNum$concertNumber, "YoutubeClicks", "ConcertNumber")
 
 
-
-
+# Wie Quantilsregression bei Dummy-Variablen? 
+printQuantreg(trainData, trainData$viewCount, trainData$concertType, "YoutubeClicks", "ConcertType")

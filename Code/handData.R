@@ -104,7 +104,7 @@ legend(3000,500,c("mean (LSE) fit", "median (LAE) fit"),
 # GGPLOT-Code (viel schöner)
 taus <- c(0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95)
 
-p <- ggplot(trainData, aes(x = age, y = Nr.views.on.Youtube)) +
+p <- ggplot(trainData, aes(x = age, y = viewCount)) +
   geom_point(alpha = 0.5) +
   geom_smooth(method = "lm", se = FALSE, color = "red", linetype = "dashed") + 
   labs(title = "Quantile Regression", x = "Age", y = "Youtube Views")

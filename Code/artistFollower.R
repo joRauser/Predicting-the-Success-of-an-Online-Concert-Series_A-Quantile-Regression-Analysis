@@ -116,8 +116,18 @@ follower_df <- import("FollowerDF_Stand,,,.csv", format = "csv")
 # Old Function:
 # follower_df <- writeFollower(follower_df, limit = 10)
 
-# New Funciton
-follower_df <- writeFollower_with_manual_fallback(follower_df, batch_size = 5)
+# New Function
+follower_df <- writeFollower_with_manual_fallback(follower_df, batch_size = 15)
 
 # to secure the Followers 
-export(follower_df, "FollowerDF_Stand23.06..csv")
+export(follower_df, "FollowerDF_Stand04.07..csv")
+
+
+# Check for possible wrong numbers
+testfollower <- follower_df %>%
+  mutate(MORE = ifelse(artistFollower > viewCount, 1, 0))
+# Result: NEED TO CHECK FOR ARTISTS, WHEN Followers > viewCount => Its sometimes false then (really not often)
+# Often the case, when artists are very famous -> Maybe account for that? 
+# Divide Data in these 2 groups -> Maybe then people who just got famous after the Tiny desk concert vs those who were it before? 
+
+follower_df$artistFollower[1] <- 1
