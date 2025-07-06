@@ -6,7 +6,9 @@ yt_oauth(app_id = "433850450109-37tg9e7qpcmfeioesfetc4kgl0d2old1.apps.googleuser
          app_secret = "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")
 # yt_oauth(app_id = "433850450109-37tg9e7qpcmfeioesfetc4kgl0d2old1.apps.googleusercontent.com",
 #         app_secret = "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")
-
+yt_oauth(app_id = "433850450109-37tg9e7qpcmfeioesfetc4kgl0d2old1.apps.googleusercontent.com",
+         app_secret = "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",
+         token = "")
 
 
 get_stats(video_id = "g5N9AOfgLZA")
