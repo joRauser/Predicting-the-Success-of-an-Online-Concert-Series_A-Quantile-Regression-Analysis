@@ -1,10 +1,8 @@
-# Get number of Followers per Artist => On Pause bcs of overload on API
-# mutate(artistFollowers = map_dbl(as.character(artist), get_max_subscribers)) 
-#### -> Händisch probieren, wie gut das beispielhaft überhaupt (konzeptionell) funktioniert 
+# Get number of Followers per Artist 
 
 follower_df <- vidStats_df
 
-# needed to get the subscribers of the artists => ON PAUSE
+# needed to get the subscribers of the artists
 get_max_subscribers <- function(artist_name) {
   # Fehler abfangen & Ausgabe unterdrücken
   suppressMessages(
@@ -33,34 +31,6 @@ get_max_subscribers <- function(artist_name) {
 }
 
 
-#testData <- testData %>%
-#  mutate(artistFollower = map_dbl(as.character(artist), get_max_subscribers))
-
-
-# ! Bis zu 100 Artist am Tag sind mit der Quota vereinbar -> Funktion schreiben, die für jeweils 5 oder 10 Künstler die Followeranzahlen überprüft
-# Somit kann auch jeder einzelfall kurz angeschaut werden und überprüft werden. Ansonsten kann jede Followerzahl händisch von Youtube gezogen werden
-
-
-writeFollower <- function(df, limit = 5) {
-  # artists without followernumber only
-  unprocessed_artists <- df %>%
-    filter(artistFollower == 0) %>%
-    distinct(artist) %>%
-    pull(artist)
-  # Set limit 
-  artists_to_process <- head(unprocessed_artists, limit)
-  
-  for (artist_name in artists_to_process) {
-    # Get follower
-    subs <- get_max_subscribers(artist_name)
-    
-    # Write into dataframe
-    df <- df %>%
-    #  mutate(artistFollower = if_else(artist == artist_name & artistFollower == 0, subs, artistFollower))
-      mutate(artistFollower = if_else(str_detect(artist, fixed(artist_name)) & artistFollower == 0, subs, artistFollower))
-  }
-  return(df)
-}
 
 
 writeFollower_with_manual_fallback <- function(df, batch_size = 5) {
@@ -105,8 +75,6 @@ writeFollower_with_manual_fallback <- function(df, batch_size = 5) {
 
 
 
-
-
 follower_df <- follower_df %>%
   mutate(artistFollower = 0)
 
@@ -117,11 +85,14 @@ follower_df <- import("FollowerDF_Stand,,,.csv", format = "csv")
 # follower_df <- writeFollower(follower_df, limit = 10)
 
 # New Function
-follower_df <- writeFollower_with_manual_fallback(follower_df, batch_size = 15)
+follower_df <- writeFollower_with_manual_fallback(follower_df, batch_size = 10)
 
 # to secure the Followers 
-export(follower_df, "FollowerDF_Stand04.07..csv")
+export(follower_df, "FollowerDF_Stand10.07..csv")
 
+
+
+### QUALITY_CHECK AND IMPROVEMENTS OF THE DATA (artistFollower only)
 
 # Check for possible wrong numbers
 testfollower <- follower_df %>%
@@ -130,4 +101,11 @@ testfollower <- follower_df %>%
 # Often the case, when artists are very famous -> Maybe account for that? 
 # Divide Data in these 2 groups -> Maybe then people who just got famous after the Tiny desk concert vs those who were it before? 
 
+# To correct the followers in a certain row use:
 follower_df$artistFollower[1] <- 1
+
+# Corrected:
+# - Wrong String-Differentiations (Follower doubled even tho the artist is another) until row 1196 
+# - Followers > viewCount until row ... 
+# - Changed the followers of "Not a normal Concert"´s to 1 
+#   follower_df$artistFollower <- ifelse(follower_df$artist == "Not a normal Concert", 1, follower_df$artistFollower)

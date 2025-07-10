@@ -76,7 +76,8 @@ vidStats_duration <- vidStats_df %>%
   ungroup() %>%
   select(-details, -duration_iso)
 
+vidStats_duration$dimension <- as.factor(vidStats_duration$dimension)
+vidStats_duration$caption <- as.factor(vidStats_duration$caption)
+
 # ToDo: 
-# - Dimension and caption "as.factor" (e.g.: vidStats_df$concertType <- relevel(as.factor(vidStats_df$concertType), ref = "N"))
-# - Ausreißer überprüfen
 # - Features in die Dokumentation aufnehmen
