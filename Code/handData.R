@@ -2,8 +2,11 @@ setwd("/Users/jonasrauser/Downloads")
 rm(list = ls())
 library(tidyverse)
 
-# Füge noch ein Datensatz-creator rein mit:
-# write.csv(Datensatz, file = "Filename")
+
+### ! DIESER DATENSATZ WIRD NICHT LÄNGER VERWENDET ! ###
+
+## -> Diese Code-Seite wird nur noch zur Informationsbeschaffung verwendet und kann prinzipiell gelöscht werden
+
 # Load dataset
 handData_updated <- read.csv("TinyDesk_handData - Tabellenblatt1.csv", header = T)
 
