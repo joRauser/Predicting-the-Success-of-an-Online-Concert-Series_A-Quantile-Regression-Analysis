@@ -88,7 +88,7 @@ follower_df <- import("FollowerDF_Stand,,,.csv", format = "csv")
 follower_df <- writeFollower_with_manual_fallback(follower_df, batch_size = 10)
 
 # to secure the Followers 
-export(follower_df, "FollowerDF_Stand12.07..csv")
+export(follower_df, "FollowerDF_Stand16.07..csv")
 
 
 
