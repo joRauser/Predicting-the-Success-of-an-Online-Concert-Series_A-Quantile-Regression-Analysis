@@ -3,7 +3,7 @@ library(quantreg)
 library(scoringRules)
 
 ### Quantile Regression
-taus <- c(0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95)
+taus <- c(0.1, 0.25, 0.5, 0.75, 0.9)
 fit <- rq(formula = viewCount ~ age + concertNumber + concertType, tau = taus, data = trainData)
 summary(fit)
 
@@ -139,5 +139,5 @@ plot_quantileRegression <- function(data, formula, fit, taus = NULL, varNum, sor
     theme_minimal(base_size = 14)
 }
 
-plot_quantileRegression(data = trainData, formula = viewCount ~ age + concertNumber + concertType, fit = fit, varNum = 1, sortByX = FALSE)
+plot_quantileRegression(data = trainData, formula = viewCount ~ age + concertNumber + concertType, fit = fit, varNum = 2, sortByX = FALSE)
 

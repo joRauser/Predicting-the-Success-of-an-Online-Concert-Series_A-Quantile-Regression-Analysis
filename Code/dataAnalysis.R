@@ -1,10 +1,10 @@
 # Divide data into train- and test-data
+# -> Delete (fivehold crossvalidation now)
 set.seed(7)
 train_dummy <- sample.int(nrow(vidStat_cleaned), floor(.7*nrow(vidStat_cleaned)))
 trainData <- vidStat_cleaned[train_dummy,]
 testData <- vidStat_cleaned[-train_dummy,]
 
-# fivehold cross validation -> Whithen / James and -> Intro to statistical learning 
 
 # GET OVERVIEW
 summary(trainData)
@@ -79,11 +79,13 @@ summary(logsecClicks)
 
 
 
-# Find out why this does not work:
-printQuantreg(trainData_coNum, viewCount, concertNumber, "YoutubeClicks", "ConcertNumber")
-# This one does worK:
+
+# Print Quantiles on the scale 
 printQuantreg(trainData_coNum, trainData_coNum$viewCount, trainData_coNum$concertNumber, "YoutubeClicks", "ConcertNumber")
 
 
 # Wie Quantilsregression bei Dummy-Variablen? 
 printQuantreg(trainData, trainData$viewCount, trainData$concertType, "YoutubeClicks", "ConcertType")
+
+
+boxplot(log(vidStats_df$viewCount) ~ vidStats_df$concertNumber)

@@ -84,13 +84,13 @@ summary(linSeaRegSum)
 library(broom)
 # List of Models:
 models <- list(
-  "Autumn as Baseline" = lm(log(viewCount) ~ season, data = dummySeason),
+  "Autumn as Baseline" = lm(log(viewCount) ~ season, data = vidStats),
   "Winter as Baseline" = lm(log(viewCount) ~ season_fact,
-                            data = transform(dummySeason, season_fact = relevel(as.factor(season), ref = "winter"))),
+                            data = transform(vidStats, season_fact = relevel(as.factor(season), ref = "winter"))),
   "Spring as Baseline" = lm(log(viewCount) ~ season_fact,
-                            data = transform(dummySeason, season_fact = relevel(as.factor(season), ref = "spring"))),
+                            data = transform(vidStats, season_fact = relevel(as.factor(season), ref = "spring"))),
   "Summer as Baseline" = lm(log(viewCount) ~ season_fact,
-                            data = transform(dummySeason, season_fact = relevel(as.factor(season), ref = "summer")))
+                            data = transform(vidStats, season_fact = relevel(as.factor(season), ref = "summer")))
 )
 
 # extract results

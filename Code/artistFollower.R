@@ -75,21 +75,15 @@ writeFollower_with_manual_fallback <- function(df, batch_size = 5) {
 
 
 
-follower_df <- follower_df %>%
-  mutate(artistFollower = 0)
-
 # to import datasets with Followers getted 
 follower_df <- import("FollowerDF_Stand,,,.csv", format = "csv")
 
-# Old Function:
-# follower_df <- writeFollower(follower_df, limit = 10)
-
-# New Function
+# Use Function
 follower_df <- writeFollower_with_manual_fallback(follower_df, batch_size = 10)
 
 # to secure the Followers 
-export(follower_df, "FollowerDF_Stand16.07..csv")
-
+export(follower_df, "FollowerDF_Stand23.07..csv")
+follower_df <- import("FollowerDF_Stand22.07..csv", format = "csv")
 
 
 ### QUALITY_CHECK AND IMPROVEMENTS OF THE DATA (artistFollower only)
@@ -105,7 +99,20 @@ testfollower <- follower_df %>%
 follower_df$artistFollower[1] <- 1
 
 # Corrected:
-# - Wrong String-Differentiations (Follower doubled even tho the artist is another) until row 1196 
+# - Wrong String-Differentiations (Follower doubled even tho the artist is another) -> Completed
 # - Followers > viewCount until row ... 
-# - Changed the followers of "Not a normal Concert"´s to 1 
+# - Changed the followers of "Not a normal Concert"´s to 1 -> Maybe search for their followers as well (by hand)
 #   follower_df$artistFollower <- ifelse(follower_df$artist == "Not a normal Concert", 1, follower_df$artistFollower)
+
+follower_df$artistFollower <- ifelse(follower_df$artist == "Not a normal Concert", 0, follower_df$artistFollower)
+
+
+
+##############################################
+#TESTING
+
+follower_df$artist <- ifelse(str_detect(follower_df$title, ":"), str_trim(str_extract(follower_df$title, "^[^:]+")), follower_df$artist)
+
+# Test, if any title (e.g. artist) is wrong bcs of missing ":" 
+testing <- which(!str_detect(follower_df$title, ":"))
+print(testing)
