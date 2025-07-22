@@ -6,12 +6,9 @@ library(lubridate)
 # Note: Code is partly from https://cran.r-project.org/web/packages/tuber/vignettes/tuber-ex.html
 
 # Yt_Dev_Authorization
-yt_oauth(app_id = "433850450109-37tg9e7qpcmfeioesfetc4kgl0d2old1.apps.googleusercontent.com",
-         app_secret = "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")
+yt_oauth()
 
-yt_oauth(app_id = "433850450109-37tg9e7qpcmfeioesfetc4kgl0d2old1.apps.googleusercontent.com",
-         app_secret = "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",
-         token = "")
+yt_oauth()
 
 ##############################
 #### GET ALL VIDEOS STATS

@@ -105,7 +105,7 @@ r2_m8 <- map_dfr(taus, ~{
 
 
 
-
+# Dataframe for all of the R-squared
 r2_allModels <- inner_join(r2_m1%>%select(-adjR2_mean), r2_m2%>%select(-adjR2_mean), by = "tau")%>%
   inner_join(.,r2_m3%>%select(-adjR2_mean), by = "tau")%>%
   inner_join(.,r2_m4%>%select(-adjR2_mean), by = "tau")%>%
@@ -117,3 +117,20 @@ r2_allModels <- inner_join(r2_m1%>%select(-adjR2_mean), r2_m2%>%select(-adjR2_me
   inner_join(.,r2_m8%>%select(-adjR2_mean), by = "tau")
 
 colnames(r2_allModels) <- c("tau", "+Age", "+cT", "cN", "+d", "-cN", "+y", "+m", "+S", "+c", "+aF")
+
+export(r2_allModels, "R2.csv")
+
+# Dataframe for all of the adjusted R-squared
+adjR2_allModels <- inner_join(r2_m1%>%select(-R2_mean), r2_m2%>%select(-R2_mean), by = "tau")%>%
+  inner_join(.,r2_m3%>%select(-R2_mean), by = "tau")%>%
+  inner_join(.,r2_m4%>%select(-R2_mean), by = "tau")%>%
+  inner_join(.,r2_m5%>%select(-R2_mean), by = "tau")%>%
+  inner_join(.,r2_m6.1%>%select(-R2_mean), by = "tau")%>%
+  inner_join(.,r2_m6.2%>%select(-R2_mean), by = "tau")%>%
+  inner_join(.,r2_m6%>%select(-R2_mean), by = "tau")%>%
+  inner_join(.,r2_m7%>%select(-R2_mean), by = "tau")%>%
+  inner_join(.,r2_m8%>%select(-R2_mean), by = "tau")
+
+colnames(adjR2_allModels) <- c("tau", "+Age", "+cT", "cN", "+d", "-cN", "+y", "+m", "+S", "+c", "+aF")
+
+export(adjR2_allModels, "adjR2.csv")
